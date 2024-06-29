@@ -14,13 +14,12 @@ from lightning import LightningModule
 from loguru import logger
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping, LearningRateMonitor
 from pytorch_lightning.loggers import TensorBoardLogger
-from rich import Console
 from rich.panel import Panel
 from rich.progress import TextColumn, Progress, SpinnerColumn, BarColumn
 from rich.table import Table
 
+from src import Console
 from src.engine.config import BenchmarkConfig
-from src.engine.data_utils import get_dataset_loader
 
 console = Console()
 
@@ -91,11 +90,8 @@ def main():
 
     console.print(f"⚙️  Loaded configuration from: [bold]{args.config}[/bold]")
 
-    # Set up data module with caching
-    data_module = get_dataset_loader(args.dataset, config, cache_dir=args.cache_dir)
 
-
-def setup_training(config: BenchmarkConfig, model: LightningModule) -> pl.Trainer:
+def setup_training(config: BenchmarkConfig, _model: LightningModule) -> pl.Trainer:
     callbacks = [
         ModelCheckpoint(monitor="val_loss", mode="min", save_top_k=3),
         EarlyStopping(monitor="val_loss", patience=5, mode="min"),
@@ -103,8 +99,6 @@ def setup_training(config: BenchmarkConfig, model: LightningModule) -> pl.Traine
     ]
 
     TensorBoardLogger("logs", name="LLMBootstrapper")
-
-
 
     return pl.Trainer(
         max_epochs=config.max_epochs,

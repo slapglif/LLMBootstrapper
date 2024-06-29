@@ -1,8 +1,9 @@
 # config.py
 
+import json
 from dataclasses import dataclass, field
 from typing import List, Optional
-import json
+
 
 @dataclass
 class ModelConfig:
@@ -20,6 +21,7 @@ class ModelConfig:
     expand_factor: float = 2.0
     dt_rank: int = 8
     n_inducing: int = 5
+
 
 @dataclass
 class BenchmarkConfig:
@@ -54,7 +56,8 @@ class BenchmarkConfig:
     calibration_method: str = "temperature_scaling"
 
     # Benchmarking configuration
-    benchmark_tasks: List[str] = field(default_factory=lambda: ["language_modeling", "text_generation", "uncertainty_estimation"])
+    benchmark_tasks: List[str] = field(
+        default_factory=lambda: ["language_modeling", "text_generation", "uncertainty_estimation"])
     metrics: List[str] = field(default_factory=lambda: ["perplexity", "bleu", "rouge", "uncertainty"])
 
     # Knowledge Distillation

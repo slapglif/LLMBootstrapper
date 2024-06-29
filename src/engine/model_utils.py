@@ -42,20 +42,20 @@ def create_transformer_model(config: BenchmarkConfig) -> PreTrainedModel:
 
 def apply_knowledge_distillation(teacher_model: nn.Module, student_model: nn.Module, alpha: float = 0.5,
                                  temperature: float = 2.0):
-    def knowledge_distillation_loss(student_logits, teacher_logits, labels, alpha, temperature):
+    def knowledge_distillation_loss(student_logits, teacher_logits, labels, _alpha, _temperature):
         distillation_loss = nn.KLDivLoss(reduction='batchmean')(
-            F.log_softmax(student_logits / temperature, dim=1),
-            F.softmax(teacher_logits / temperature, dim=1)
-        ) * (temperature ** 2)
+            F.log_softmax(student_logits / _temperature, dim=1),
+            F.softmax(teacher_logits / _temperature, dim=1)
+        ) * (_temperature ** 2)
         student_loss = F.cross_entropy(student_logits, labels)
-        return alpha * distillation_loss + (1 - alpha) * student_loss
+        return _alpha * distillation_loss + (1 - _alpha) * student_loss
 
     student_model.knowledge_distillation_loss = knowledge_distillation_loss
     student_model.teacher_model = teacher_model
     student_model.kd_alpha = alpha
     student_model.kd_temperature = temperature
 
-    logger.info(f"Applied knowledge distillation with alpha={alpha} and temperature={temperature}")
+    logger.info(f"Applied knowledge distillation with _alpha={alpha} and _temperature={temperature}")
 
 
 def optimize_model_for_inference(model: PreTrainedModel):
@@ -64,7 +64,7 @@ def optimize_model_for_inference(model: PreTrainedModel):
 
     model = torch.jit.script(model)
 
-    logger.info("Model optimized with TorchScript")
+    logger.info('Model optimized with TorchScript')
     return model
 
 

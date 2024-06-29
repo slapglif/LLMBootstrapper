@@ -101,9 +101,9 @@ def main():
         console.print(f"Loading model from checkpoint: {args.checkpoint}")
     model = None
     ###### TODO: Implement your Lightning Module here me
-        # model = LightningModule.load_from_checkpoint(args.checkpoint)
-    #else:
-        # model = LightningModule(config)
+    # model = LightningModule.load_from_checkpoint(args.checkpoint)
+    # else:
+    # model = LightningModule(config)
 
     # Setup trainer
 

@@ -33,7 +33,7 @@ Welcome to LLMBootstrapper! 🥾 This project aims to streamline your journey fr
 
 1. **Clone the repository:** 
    ```bash
-   git clone https://github.com/your-username/LLMBootstrapper.git
+   git clone https://github.com/slapglif/LLMBootstrapper.git
    ```
 2. **Install dependencies:** 
    ```bash

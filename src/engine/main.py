@@ -5,8 +5,6 @@ import argparse
 import json
 import os
 import sys
-import time
-import traceback
 from pathlib import Path
 from typing import Dict, Any
 
@@ -16,15 +14,13 @@ from lightning import LightningModule
 from loguru import logger
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping, LearningRateMonitor
 from pytorch_lightning.loggers import TensorBoardLogger
+from rich import Console
+from rich.panel import Panel
+from rich.progress import TextColumn, Progress, SpinnerColumn, BarColumn
+from rich.table import Table
 
-from torch.utils.data import DataLoader
-
-from src.engine.augmentation import apply_augmentations
 from src.engine.config import BenchmarkConfig
 from src.engine.data_utils import get_dataset_loader
-from src.engine.metrics import calculate_uncertainty_metrics, calculate_auc_roc, calculate_log_loss, \
-    calculate_mutual_information, calculate_predictive_entropy, calculate_diversity_metrics, calculate_bleu_score, \
-    calculate_rouge_scores, calculate_perplexity, calculate_accuracy, calculate_precision_recall_f1
 
 console = Console()
 
@@ -49,28 +45,6 @@ def setup_environment(config: BenchmarkConfig):
     pl.seed_everything(config.seed)
     torch.set_float32_matmul_precision('high')
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
-
-
-def setup_trainer(config: BenchmarkConfig) -> pl.Trainer:
-    callbacks = [
-        ModelCheckpoint(monitor="val_loss", mode="min", save_top_k=3),
-        EarlyStopping(monitor="val_loss", patience=config.early_stopping_patience, mode="min"),
-        LearningRateMonitor(logging_interval="step")
-    ]
-
-    logger = TensorBoardLogger("logs", name="uncertain_transformer")
-
-    return pl.Trainer(
-        max_epochs=config.max_epochs,
-        callbacks=callbacks,
-        logger=logger,
-        gpus=torch.cuda.device_count(),
-        strategy="ddp" if torch.cuda.device_count() > 1 else None,
-        precision=16 if config.use_mixed_precision else 32,
-        accumulate_grad_batches=config.accumulate_grad_batches,
-        gradient_clip_val=config.gradient_clip_val,
-        progress_bar_refresh_rate=0,  # Disable default progress bar
-    )
 
 
 def run_training(model: pl.LightningModule, data_module: pl.LightningDataModule, trainer: pl.Trainer):
@@ -110,7 +84,7 @@ def main():
     parser = setup_arg_parser()
     args = parser.parse_args()
 
-    rprint(Panel.fit("🚀 [bold cyan]Advanced Benchmarking Tool for Uncertain Transformers[/bold cyan] 🚀"))
+    console.print(Panel.fit("🚀 [bold cyan]Advanced Benchmarking Tool for Uncertain Transformers[/bold cyan] 🚀"))
 
     config = BenchmarkConfig.from_json(args.config)
     setup_environment(config)
@@ -141,7 +115,6 @@ def setup_training(config: BenchmarkConfig, model: LightningModule) -> pl.Traine
         accumulate_grad_batches=config.accumulate_grad_batches,
         gradient_clip_val=config.gradient_clip_val,
     )
-
 
 
 if __name__ == "__main__":

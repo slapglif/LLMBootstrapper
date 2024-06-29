@@ -102,9 +102,9 @@ def setup_training(config: BenchmarkConfig, model: LightningModule) -> pl.Traine
         LearningRateMonitor(logging_interval="step")
     ]
 
-    logger = TensorBoardLogger("logs", name="uncertain_transformer")
+    TensorBoardLogger("logs", name="LLMBootstrapper")
 
-    console.print("[bold green]✨ All operations completed successfully! ✨[/bold green]")
+
 
     return pl.Trainer(
         max_epochs=config.max_epochs,
@@ -120,6 +120,7 @@ def setup_training(config: BenchmarkConfig, model: LightningModule) -> pl.Traine
 if __name__ == "__main__":
     try:
         main()
+        console.print("[bold green]✨ All operations completed successfully! ✨[/bold green]")
     except Exception as e:
         logger.exception("An error occurred during execution:")
         console.print(f"[bold red]Error: {str(e)}[/bold red]")
